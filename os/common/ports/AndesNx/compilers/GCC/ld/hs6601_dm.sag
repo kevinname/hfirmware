@@ -1,0 +1,48 @@
+USER_SECTIONS .ramtext, .mp3text, .bttext
+
+FLASH 0x80000000
+{    
+    flash_ROM 0x80000000 0x100000; 
+    {
+    	LOADADDR NEXT __init_lma_start
+        * (.nds32_init)   
+        LOADADDR NEXT __init_lma_end
+            
+        * (+RO-CODE)
+        * (+RO-DATA) 
+    }
+    
+    common_coderam 0x80400290 0x0d70; 
+    {
+    	LOADADDR NEXT __code_lma_start
+        ADDR NEXT __code_vma_start
+        * (.ramtext)
+        LOADADDR __code_lma_end 
+    }
+    
+	ovl_coderam 0x80401000 OVERLAY 0
+	{    	
+		.mp3_seg {* (.mp3text)}    
+		.bt_seg  {* (.bttext )}         
+	} 
+    
+    RAM 0x80407800 0x20800 ; 
+    {
+		LOADADDR NEXT __rw_lma_start
+        ADDR NEXT __rw_vma_start
+        *(+RW LMA_FORCE_ALIGN)
+        LOADADDR NEXT __rw_lma_end
+        ADDR NEXT __rw_vma_end 
+        
+        *(+ZI LMA_FORCE_ALIGN)
+        ADDR __heap_base__
+        
+        VAR __heap_end__    = 0x804277ff
+        VAR __main_thread_stack_base__    = 0x80427800
+        STACK = 0x80427c00  
+        VAR __main_stack__  = 0x80427ff8  
+        
+        VAR __ilm_base__    = 0x80400000
+  		VAR __vector_base__ = 0x80400000
+   }
+}

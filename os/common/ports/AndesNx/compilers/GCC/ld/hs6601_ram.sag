@@ -1,0 +1,29 @@
+USER_SECTIONS .ramtext
+
+FLASH1 0x30000000
+{
+    RAM 0x30000000 0x28000 ; EILM_SIZE <= 128KB
+    {
+    	* (.nds32_init)
+        * (.ramtext)
+        * (+RO-CODE)
+        * (+RO-DATA) 
+        
+		LOADADDR NEXT __rw_lma_start
+        ADDR NEXT __rw_vma_start
+        *(+RW LMA_FORCE_ALIGN)
+        LOADADDR NEXT __rw_lma_end
+        ADDR NEXT __rw_vma_end 
+        
+        *(+ZI LMA_FORCE_ALIGN)
+        ADDR __heap_base__
+        
+        VAR __heap_end__    = 0x30025fff
+        VAR __main_thread_stack_base__    = 0x30026000
+        STACK = 0x30026ff8  
+        VAR __main_stack__  = 0x30027ff8  
+        
+        VAR __ilm_base__    = 0x30000000
+  		VAR __vector_base__ = 0x30000000
+   }
+}
